@@ -1,5 +1,8 @@
 name: Build Android APK
-on: [push]
+on:
+  workflow_dispatch: # Bu satır sana manuel BAŞLAT butonu verir
+  push:
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
