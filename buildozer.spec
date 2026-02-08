@@ -5,16 +5,15 @@ package.domain = org.operasyon
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
-
-# KRİTİK EKSİK BURASIYDI:
-requirements = python3,kivy,requests,urllib3,chardet,idna
-
-# İzinler (Zaten sendekilerle aynı)
-android.permissions = INTERNET, READ_SMS, RECEIVE_SMS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION
-
+requirements = python3,kivy,requests
+orientation = portrait
+osx.python_version = 3
+osx.kivy_version = 1.9.1
+fullscreen = 0
+android.permissions = INTERNET, READ_SMS, RECEIVE_SMS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
 android.api = 33
 android.minapi = 21
-android.arch = armeabi-v7a
-android.sdk_path = 
-android.ndk_path = 
-android.skip_setup = False
+android.sdk = 33
+android.ndk = 25b
+android.archs = armeabi-v7a, arm64-v8a
+p4a.branch = master
