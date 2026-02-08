@@ -1,4 +1,4 @@
-name: Build EXE
+name: Build EXE with Icon
 on: [push]
 jobs:
   build:
@@ -17,12 +17,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install pyinstaller cryptography requests pypiwin32
 
-    - name: Build EXE
+    - name: Build EXE with Icon
       run: |
-        pyinstaller --onefile --noconsole final_gorev.py
+        pyinstaller --onefile --noconsole --icon=icon.ico final_gorev.py
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: operasyon_exe
+        name: ikonlu_operasyon_exe
         path: dist/final_gorev.exe
