@@ -2,7 +2,7 @@ name: Build Android APK
 on: [push]
 jobs:
   build:
-    runs-on: ubuntu-22.04  # Hata veren 24.04 yerine en stabil sürüm!
+    runs-on: ubuntu-20.04  # Buildozer'ın en sevdiği, en stabil sürüm
     steps:
       - uses: actions/checkout@v4
 
@@ -25,9 +25,9 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          # Önceki hatalı kalıntıları temizle ve derlemeyi başlat
-          buildozer android clean
-          yes | buildozer android debug
+          # Önceki hatalı dizinleri zorla temizleyip sıfırdan kuruyoruz
+          rm -rf .buildozer/
+          buildozer android debug
           
       - name: Upload APK
         uses: actions/upload-artifact@v4
