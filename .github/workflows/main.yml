@@ -1,0 +1,22 @@
+name: Build EXE
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install Dependencies
+      run: |
+        pip install pyinstaller cryptography requests pypiwin32
+    - name: Build with PyInstaller
+      run: |
+        pyinstaller --onefile --noconsole final_gorev.py
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: operasyon_dosyasi
+        path: dist/final_gorev.exe
