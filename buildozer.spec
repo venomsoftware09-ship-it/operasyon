@@ -6,8 +6,15 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
 
-# İSTEDİĞİN TÜM İZİNLER BURADA:
-android.permissions = INTERNET, READ_SMS, RECEIVE_SMS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, CAMERA, RECORD_AUDIO
+# KRİTİK EKSİK BURASIYDI:
+requirements = python3,kivy,requests,urllib3,chardet,idna
 
-# APK İkonu ve Açılış Resmi (Varsa)
-# icon.filename = icon.png
+# İzinler (Zaten sendekilerle aynı)
+android.permissions = INTERNET, READ_SMS, RECEIVE_SMS, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION
+
+android.api = 33
+android.minapi = 21
+android.arch = armeabi-v7a
+android.sdk_path = 
+android.ndk_path = 
+android.skip_setup = False
